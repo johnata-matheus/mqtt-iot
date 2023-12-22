@@ -34,13 +34,15 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('message', (topic, message) => {
-  const data = message.toString();
+  const payload = JSON.parse(message.toString());
+  const data = Number(payload[0]);
+  const data2 = payload[1].toString();
   const topicData = topic.toString();
   console.log(data, topic)
 
-  const insertQuery = 'INSERT INTO mensagens_mqtt (topico, payload) VALUES (?, ?)';
+  const insertQuery = 'INSERT INTO mensagens_mqtt (topico, payload, payloadColor) VALUES (?, ?, ?)';
   
-  connection.query(insertQuery, [data, topicData], (error, results, fields) => {
+  connection.query(insertQuery, [topicData, data, data2], (error, results, fields) => {
     if (error) {
       console.error('Erro ao inserir dados no banco de dados:', error);
       return;
@@ -48,4 +50,3 @@ mqttClient.on('message', (topic, message) => {
     console.log('Dados inseridos com sucesso no banco de dados:', results);
   });
 });
-  
